@@ -7,11 +7,13 @@
 ; Dependencies: NONE
 ; Compiler: xc8, 3.10
 ; Author: Derek Kan
+; Credit to Dr. Farahmand for original code of _setupPortD/B, loopDelay
 ; OUTPUTS: PORTD
-; INPUTS: 
+; INPUTS: PORTB [2:1]
 ; Versions:
 ; V0.1: 3/25/26 - work in progress, only increment triggered with button
 ; V0.2: 3/25/26 - increment, decrement, reset, hold number added
+; V1.0: 3/31/26 - comments added
 ;-----------------------------
 
 ;---------------------
@@ -46,19 +48,22 @@ Outer_loop  equ 255
 ;---------------------
 ; Setup & Main Program
 ;---------------------   
-_setup:
+_setup: ;setup the ports as inputs/outputs
     clrf WREG
     CALL _setupPortD
     CALL _setupPortB
     clrf PORTB
     clrf PORTD
         
-_main:
-    CLRF 0x55
+_main: ;this displays nothing until a button is pressed
+    CLRF 0x55 ;exit "restart mode"
     MOVLW 0x00
     MOVWF PORTD
     CALL _3loops
-display0:
+display0: ;each display function places the appropriate number into PORTD,
+	  ;calls a delay function, then checks whether only switch B is pressed
+	  ;(which then jumps to the previous number) or not (which then moves
+	  ;forward to the next number)
     MOVLW 0xBF ;display 0 by lighting up correct segments
     MOVWF PORTD
     CALL _3loops
@@ -170,13 +175,13 @@ displayF:
     MOVLW 0x02
     SUBWF PORTB, 0
     BZ	  displayE
-    GOTO display0
+    GOTO display0 ;loops back to display 0
     
     
 ;-------------------------------------
 ; Call Functions
 ;-------------------------------------
-_setupPortD:
+_setupPortD:   ;sets up PORTD as outputs
     BANKSEL	PORTD ;
     CLRF	PORTD ;Init PORTA
     BANKSEL	LATD ;Data Latch
@@ -188,7 +193,7 @@ _setupPortD:
     MOVWF	TRISD 
     RETURN
 
-_setupPortB:
+_setupPortB:   ;sets up PORTB 2, 1 as inputs
     BANKSEL	PORTB ;
     CLRF	PORTB ;Init PORTB
     BANKSEL	LATB ;Data Latch
@@ -202,20 +207,20 @@ _setupPortB:
     
     
 ;-----The Delay Subroutine    
-loopDelay: 
+loopDelay: ;this initalizes the loop delay
     MOVLW       Inner_loop
     MOVWF       0x10
     MOVLW       Outer_loop
     MOVWF       0x11
-_loop1:
+_loop1:   ;this is the actual loop
     DECF        0x10,1
     BNZ         _loop1
     MOVLW       Inner_loop ; Re-initialize the inner loop for when the outer loop decrements.
     MOVWF       0x10
     DECF        0x11,1 // outer loop
-    BTFSC	0x55, 0
+    BTFSC	0x55, 0  ;if in "restart mode", ignore pressed buttons
     GOTO	restartjump
-    MOVLW	0x06 ;if both buttons pressed, go back to main
+    MOVLW	0x06 ;if both buttons pressed, go to restart
     CPFSLT	PORTB
     GOTO	restart
     MOVLW	0x00 ;if neither button pressed, extend delay
@@ -231,16 +236,11 @@ restart:
     MOVLW 0xBF ;display 0 by lighting up correct segments
     MOVWF PORTD
     MOVWF 0x55
-    CALL  _3loops
+    CALL  _3loops  ;delay so that the user sees the 0, "restart mode" on
     GOTO    _main
     
-_3loops:
+_3loops: ;needed to extend delay time
     CALL loopDelay
     CALL loopDelay
     CALL loopDelay
     RETURN
-    
-    
-
-
-    

@@ -6,6 +6,7 @@
 ; segment counter using switches.
 ; Dependencies: NONE
 ; Compiler: xc8, 3.10
+; Operating System: Windows 11 
 ; Author: Derek Kan
 ; Credit to Dr. Farahmand for original code of _setupPortD/B, loopDelay
 ; OUTPUTS: PORTD
@@ -244,3 +245,8 @@ _3loops: ;needed to extend delay time
     CALL loopDelay
     CALL loopDelay
     RETURN
+    
+    
+
+
+    

@@ -15,6 +15,7 @@
 ; V0.1: 3/25/26 - work in progress, only increment triggered with button
 ; V0.2: 3/25/26 - increment, decrement, reset, hold number added
 ; V1.0: 3/31/26 - comments added
+; V1.1: 4/1/26  - added pointers, minor fixes
 ;-----------------------------
 
 ;---------------------
@@ -55,9 +56,10 @@ _setup: ;setup the ports as inputs/outputs
     CALL _setupPortB
     clrf PORTB
     clrf PORTD
+    LFSR 0, 0x55
         
 _main: ;this displays nothing until a button is pressed
-    CLRF 0x55 ;exit "restart mode"
+    CLRF INDF0 ;exit "restart mode"
     MOVLW 0x00
     MOVWF PORTD
     CALL _3loops
@@ -65,7 +67,7 @@ display0: ;each display function places the appropriate number into PORTD,
 	  ;calls a delay function, then checks whether only switch B is pressed
 	  ;(which then jumps to the previous number) or not (which then moves
 	  ;forward to the next number)
-    MOVLW 0xBF ;display 0 by lighting up correct segments
+    MOVLW 0x3F ;display 0 by lighting up correct segments
     MOVWF PORTD
     CALL _3loops
     MOVLW 0x02
@@ -236,7 +238,7 @@ restartjump:
 restart:
     MOVLW 0xBF ;display 0 by lighting up correct segments
     MOVWF PORTD
-    MOVWF 0x55
+    MOVWF INDF0
     CALL  _3loops  ;delay so that the user sees the 0, "restart mode" on
     GOTO    _main
     
@@ -245,8 +247,3 @@ _3loops: ;needed to extend delay time
     CALL loopDelay
     CALL loopDelay
     RETURN
-    
-    
-
-
-    

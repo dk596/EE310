@@ -52,15 +52,15 @@ void main(void)
         MonitorSensor(sensor1);
 
         // Example changing temperature values
-       // __delay_ms(2000);
+        __delay_ms(2000);
         sensor1.temperature = 22;
         MonitorSensor(sensor1);
 
-       // __delay_ms(2000);
+        __delay_ms(2000);
         sensor1.temperature = 27;
         MonitorSensor(sensor1);
 
-       // __delay_ms(2000);
+        __delay_ms(2000);
         sensor1.temperature = 3985;
         MonitorSensor(sensor1);
     }

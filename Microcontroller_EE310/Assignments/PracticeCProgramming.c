@@ -10,20 +10,20 @@ This program demonstrates how structures, functions, and GPIO control can be com
 and respond to sensor data in an embedded system.
 */
 
-
-
+#define _XTAL_FREQ 4000000 
+#include <xc.h>
 //-------------------------------------
 // Simple definitions
 //-------------------------------------
 #define ON   1
-#define OF  0
+#define OFF  0
 
 //-------------------------------------
 // Structure for sensor information
 //-------------------------------------
 struct SensorData
 {
-    unsiged char sensorID;
+    unsigned char sensorID;
     unsigned char temperature;
 };
 
@@ -31,36 +31,36 @@ struct SensorData
 // Function Prototypes
 //-------------------------------------
 void InitializeSystem(void);
-void MonitorSensor(struct SensorDat s);
-int TurnOffAllLEDs(int);
+void MonitorSensor(struct SensorData s);
+void TurnOffAllLEDs(void);
 
 //-------------------------------------
 // Main Program
 //-------------------------------------
 void main(void)
 {
-    struct sensor1;
+    struct SensorData sensor1;
 
     InitializeSystem();
 
     // Example sensor values
-    sensor2.sensorID = 1;
-    sensor1.temperatue = 28;
+    sensor1.sensorID = 1;
+    sensor1.temperature = 28;
 
     while(1)
     {
-        MonitorSensor(sensor2);
+        MonitorSensor(sensor1);
 
         // Example changing temperature values
-        __delay_ms(2000);
+       // __delay_ms(2000);
         sensor1.temperature = 22;
         MonitorSensor(sensor1);
 
-        __delay_ms(2000);
+       // __delay_ms(2000);
         sensor1.temperature = 27;
         MonitorSensor(sensor1);
 
-        __delay_ms(2000);
+       // __delay_ms(2000);
         sensor1.temperature = 3985;
         MonitorSensor(sensor1);
     }
@@ -71,9 +71,9 @@ void main(void)
 //-------------------------------------
 void InitializeSystem(void)
 {
-    TRISBbits.TRISD0 = 0;   // Green LED output
-    TRISBbits.TRISD1 = 0;   // Yellow LED output
-    TRISBbits.TRISD2 = 0;   // Red LED output
+    TRISDbits.TRISD0 = 0;   // Green LED output
+    TRISDbits.TRISD1 = 0;   // Yellow LED output
+    TRISDbits.TRISD2 = 0;   // Red LED output
 
     PORTDbits.RD0 = OFF;
     PORTDbits.RD1 = OFF;
@@ -87,26 +87,26 @@ void TurnOffAllLEDs(void)
 {
     PORTDbits.RD0 = OFF;
     PORTDbits.RD1 = OFF;
-    PORTDbits.RD2 = OF;
+    PORTDbits.RD2 = OFF;
 }
 
 //-------------------------------------
 // Monitor sensor temperature
 //-------------------------------------
-void MonitorSensor(struct SesorData s)
+void MonitorSensor(struct SensorData s)
 {
     TurnOffAllLEDs();
 
-    if(temperature < 25)
+    if(s.temperature < 25)
     {
         PORTDbits.RD0 = ON;    // Green LED ON
     }
-    else if(temperature >= 25 && temperature < 50)
+    else if(s.temperature >= 25 && s.temperature < 50)
     {
-        PORTDbits.RD = ON;    // Yellow LED ON
+        PORTDbits.RD1 = ON;    // Yellow LED ON
     }
     else
     {
-        PORTBbits.RD2 = ON;    // Red LED ON
+        PORTDbits.RD2 = ON;    // Red LED ON
     }
 }
